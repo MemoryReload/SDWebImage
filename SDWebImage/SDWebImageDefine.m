@@ -75,12 +75,18 @@ inline UIImage * _Nullable SDScaledImageForScaleFactor(CGFloat scale, UIImage * 
     }
     UIImage *scaledImage;
     if (image.sd_isAnimated) {
+        //如果是Gif
         UIImage *animatedImage;
 #if SD_UIKIT || SD_WATCH
         // `UIAnimatedImage` images share the same size and scale.
         NSMutableArray<UIImage *> *scaledImages = [NSMutableArray array];
         
         for (UIImage *tempImage in image.images) {
+            /*
+             UIImage的缩放，取出原图片的CGImage，其中包含了图片数据，
+             然后重新创建新的UIImage，设置相应的scale即可，UIImage保持
+             这样的关系: size * scale = resolutionSize
+             */
             UIImage *tempScaledImage = [[UIImage alloc] initWithCGImage:tempImage.CGImage scale:scale orientation:tempImage.imageOrientation];
             [scaledImages addObject:tempScaledImage];
         }
@@ -90,6 +96,7 @@ inline UIImage * _Nullable SDScaledImageForScaleFactor(CGFloat scale, UIImage * 
 #else
         // Animated GIF for `NSImage` need to grab `NSBitmapImageRep`;
         NSRect imageRect = NSMakeRect(0, 0, image.size.width, image.size.height);
+        //NSImage找到最合适的像素数据，因为NSImage可以有多个representations
         NSImageRep *imageRep = [image bestRepresentationForRect:imageRect context:nil hints:nil];
         NSBitmapImageRep *bitmapImageRep;
         if ([imageRep isKindOfClass:[NSBitmapImageRep class]]) {
