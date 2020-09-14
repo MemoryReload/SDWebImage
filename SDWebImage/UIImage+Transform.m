@@ -24,14 +24,14 @@ static inline CGRect SDCGRectFitWithScaleMode(CGRect rect, CGSize size, SDImageS
         case SDImageScaleModeAspectFit:
         case SDImageScaleModeAspectFill: {
             if (rect.size.width < 0.01 || rect.size.height < 0.01 ||
-                size.width < 0.01 || size.height < 0.01) {
+                size.width < 0.01 || size.height < 0.01) { //防止除零引起的错误
                 rect.origin = center;
                 rect.size = CGSizeZero;
             } else {
                 CGFloat scale;
                 if (scaleMode == SDImageScaleModeAspectFit) {
-                    if (size.width / size.height < rect.size.width / rect.size.height) {
-                        scale = rect.size.height / size.height;
+                    if (size.width / size.height < rect.size.width / rect.size.height) {//画布宽高比大于图片的宽高比，说明超宽
+                        scale = rect.size.height / size.height;//按照短边比例（高）
                     } else {
                         scale = rect.size.width / size.width;
                     }
